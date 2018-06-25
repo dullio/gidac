@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"></meta>
+<title>Histório Desenvolvimento G-IDAC</title>
+
+<link href="webjars/highlightjs/styles/rainbow.css" rel="stylesheet"
+	type="text/css" />
+
+
+
+
+</head>
+<body>
+	<h1>Histório Desenvolvimento G-IDAC</h1>
+	
+	<h2>Repositório GIT</h2>
+	<p>Criar repósitorio no GitHub e clonar para o seu PC.</p>
+	<p>Criar projeto Spring Starter colocando como local o repositorio clonado.</p>
+	
+	
+	
+	
+	<h2>Incluir WebJars no pom.xml</h2>
+	
+	<pre><code >
+	<!-- Webjars locator -->
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.webjars&lt;/groupId&gt;
+			&lt;artifactId&gt;bootstrap&lt;/artifactId&gt;
+			&lt;version&gt;3.3.4&lt;/version&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.webjars&lt;/groupId&gt;
+			&lt;artifactId&gt;jquery&lt;/artifactId&gt;
+			&lt;version&gt;2.1.4&lt;/version&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.webjars&lt;/groupId&gt;
+			&lt;artifactId&gt;jTable&lt;/artifactId&gt;
+			&lt;version&gt;2.4.0&lt;/version&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.webjars&lt;/groupId&gt;
+			&lt;artifactId&gt;webjars-locator&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.webjars&lt;/groupId&gt;
+			&lt;artifactId&gt;jquery-ui&lt;/artifactId&gt;
+			&lt;version&gt;1.12.1&lt;/version&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.webjars&lt;/groupId&gt;
+			&lt;artifactId&gt;jquery-ui-themes&lt;/artifactId&gt;
+			&lt;version&gt;1.12.1&lt;/version&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.webjars&lt;/groupId&gt;
+			&lt;artifactId&gt;highlightjs&lt;/artifactId&gt;
+			&lt;version&gt;9.8.0&lt;/version&gt;
+		&lt;/dependency&gt;
+	</code></pre>
+	
+	
+	
+	<h2>Criar a estrutura do projeto</h2>
+	<img src="/images/history/estrutura-projeto.png" alt=""/>
+	
+	<p>Descrever as pastas do projeto</p>
+	<h2>Configurar a Basa de Dados</h2>
+	
+	
+	<div class="principal">
+	<pre><code class="java">
+	
+		
+		package br.com.va4e.gidac;
+		
+		import org.springframework.boot.SpringApplication;
+		import org.springframework.boot.autoconfigure.SpringBootApplication;
+		
+		@SpringBootApplication
+		public class Gidac1Application {
+		
+			public static void main(String[] args) {
+				SpringApplication.run(Gidac1Application.class, args);
+			}
+		}
+	
+	
+	</code></pre>
+
+
+</div>
+
+
+
+
+
+	
+	
+	
+	
+</body>
+<footer>
+
+	<script src="webjars/highlightjs/highlight.min.js"
+		type="text/javascript"></script>
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+</footer>
+</html>
