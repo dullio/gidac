@@ -48,8 +48,9 @@
 		</section>
 		
 				<section>
-			<h2>Configurar o LOG no application.properties</h2>
-			<pre><code>
+					<h2>Configurar o LOG no application.properties</h2>
+					<pre><code>
+# Logger Config
 logging.file=log/spring-gidac-logging.log
 logging.level.org.springframework.web=DEBUG
 logging.level.br.com.va4e.idac=TRACE
@@ -57,13 +58,20 @@ logging.level.org.hibernate=DEBUG
 logging.level.com.mchangge.v2.c3p0=DEBUG
 logging.level.org.springframework.orm=TRACE
 logging.level.org.springframework.data=TRACE
+
 logging.level.org.thymeleaf=DEBUG
 spring.main.banner-mode=off 
 spring.output.ansi.enabled=ALWAYS
+
+# Logging pattern for the console
 logging.pattern.console=  %clr(%5p) %d{yyyy-MM-dd HH:mm:ss} - %msg%n
+
+# Logging pattern for file
 logging.pattern.file=%d ${CONTEXT_NAME} %level %msg %logger{50}%n
-			</code></pre>
-		</section>
+
+#Setting active profile
+spring.profiles.active=default</code></pre>
+				</section>
 		
 		<section>
 			<h2>Incluir WebJars no pom.xml</h2>
@@ -168,16 +176,723 @@ idac.connection.pool.maxIdleTime=3000
 			
 			
 			<h3>Criar a classe "DatabaseConfig.class" no pacote "br.com.va4e.gidac.config"</h3>
-			<pre><code>
-			
-			
-			
+			<pre><code class="java">
+package br.com.va4e.gidac.config;
+
+import java.beans.PropertyVetoException;
+import java.util.logging.Logger;
+
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.JpaVendorAdapter;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.Database;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+
+@Configuration
+@PropertySource("classpath:database-persistence.properties")
+@EnableJpaRepositories(enableDefaultTransactions = true)
+@EnableTransactionManagement
+public class DatabaseConfig {
+
+	@Autowired
+	private Environment env;
+
+	private Logger logger = Logger.getLogger(getClass().getName());
+
+	@Bean
+	public DataSource DataSource() {
+
+		// create connection pool
+		ComboPooledDataSource dataSource = new ComboPooledDataSource();
+
+		// set the jdbc driver class
+
+		try {
+			dataSource.setDriverClass(env.getProperty("idac.datasource.driver-class-name"));
+		} catch (PropertyVetoException exc) {
+		
+			throw new RuntimeException(exc);
+		}
+
+		// log the connection props
+		// for sanity's sake, log this info
+		// just to make sure we are REALLY reading data from properties file
+
+		logger.info(">>>Database jdbc.url=" + env.getProperty("idac.datasource.url"));
+		logger.info(">>>Database jdbc.user=" + env.getProperty("idac.datasource.username"));
+		// set database connection props
+
+		dataSource.setJdbcUrl(env.getProperty("idac.datasource.url"));
+		dataSource.setUser(env.getProperty("idac.datasource.username"));
+		dataSource.setPassword(env.getProperty("idac.datasource.password"));
+
+		// set connection pool props
+
+		dataSource.setInitialPoolSize(getIntProperty("idac.connection.pool.initialPoolSize"));
+
+		dataSource.setMinPoolSize(getIntProperty("idac.connection.pool.minPoolSize"));
+
+		dataSource.setMaxPoolSize(getIntProperty("idac.connection.pool.maxPoolSize"));
+
+		dataSource.setMaxIdleTime(getIntProperty("idac.connection.pool.maxIdleTime"));
+
+		return dataSource;
+	}
+
+	@Bean
+	public JpaVendorAdapter jpaVendorAdapter(){
+		HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
+		adapter.setDatabase(Database.MYSQL);
+		adapter.setShowSql(getBoolProperty("idac.jpa.show-sql"));
+		adapter.setGenerateDdl(true);
+
+		adapter.setDatabasePlatform(env.getProperty("idac.jpa.properties.hibernate.dialect"));
+
+		return adapter;
+
+	}
+
+	@Bean
+	public EntityManagerFactory entityManagerFactory(DataSource dataSource, JpaVendorAdapter jpaVendorAdapter) {
+
+		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
+		factory.setDataSource(dataSource);
+		factory.setJpaVendorAdapter(jpaVendorAdapter);
+		factory.setPackagesToScan("br.com.va4e.idac");
+		factory.afterPropertiesSet();
+
+		return factory.getObject();
+	}
+
+	@Bean
+	public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+		JpaTransactionManager transactionManager = new JpaTransactionManager();
+		transactionManager.setEntityManagerFactory(entityManagerFactory);
+		return transactionManager;
+	}
+
+	// need a helper method
+	// read environment property and convert to int
+
+	private int getIntProperty(String propName) {
+
+		String propVal = env.getProperty(propName);
+
+		// now convert to int
+		int intPropVal = Integer.parseInt(propVal);
+
+		return intPropVal;
+	}
+	
+	private boolean getBoolProperty(String propName) {
+
+		String propVal = env.getProperty(propName);
+		
+		if (propVal=="true") {
+			return true;
+		}else {
+			return false;
+		}
+
+	}
+
+}			
 			</code></pre>
-		
-		
 		</section>
 		
-		
+		<section>
+			<h2>Criar as Entidades</h2>
+			<h3>Criar a classe "Member.class" no pacote "br.com.va4e.gidac.entity"</h3>
+			<pre><code class="java">
+package br.com.va4e.gidac.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
+@Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "firstName", "lastName" }), name = "member")
+public class Member implements Serializable {
+
+	public Member(String firstName, String lastName, String userName, String cpf, String rg, String gender, String note,
+			boolean active, Date birthday) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.userName = userName;
+		this.cpf = cpf;
+		this.rg = rg;
+		this.gender = gender;
+		this.note = note;
+		this.active = active;
+		this.birthday = birthday;
+	}
+
+	public Member() {
+
+	}
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@NotNull
+	@Size(min = 2, max = 25)
+	@Pattern(regexp = "[A-Za-z ]*", message = "must contain only letters and spaces")
+	private String firstName;
+
+	@NotNull
+	@Size(min = 2, max = 25)
+	@Pattern(regexp = "[A-Za-z ]*", message = "must contain only letters and spaces")
+	private String lastName;
+
+	@Column(unique = true)
+	@Pattern(regexp = "[A-Za-z]*", message = "must contain only letters")
+	private String userName;
+
+	private String cpf;
+
+	private String rg;
+
+	private String gender;
+
+	private String note;
+
+	@NotNull
+	private boolean active;
+
+	@Temporal(TemporalType.DATE)
+	private Date birthday;
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public Date getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
+	}
+
+	public String getCpf() {
+		return cpf;
+	}
+
+	public void setCpf(String cpf) {
+		this.cpf = cpf;
+	}
+
+	public String getRg() {
+		return rg;
+	}
+
+	public void setRg(String rg) {
+		this.rg = rg;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	@Override
+	public String toString() {
+		return "Member [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", userName=" + userName
+				+ "]";
+	}
+
+}
+			</code></pre>
+					<h3>Criar a classe "MemberAddress.class" no pacote "br.com.va4e.gidac.entity"</h3>
+			<pre><code class="java">
+package br.com.va4e.gidac.entity;
+
+import java.io.Serializable;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
+
+
+@Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"street", "number", "complement", "cep", "city", "state", "country", "type", "member_id"}), name = "member_address")
+public class MemberAddress implements Serializable {
+
+	public MemberAddress() {
+
+	}
+
+	public MemberAddress(String street, String number, String complement, String cep, String city, String state,
+			String country, int type, Member member) {
+
+		this.street = street;
+		this.number = number;
+		this.complement = complement;
+		this.cep = cep;
+		this.city = city;
+		this.state = state;
+		this.country = country;
+		this.type = type;
+		this.member = member;
+	}
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@NotNull
+	private String street;
+
+	@NotNull
+	private String number;
+
+	@NotNull
+	private String complement;
+
+	private String cep;
+
+	// private City city;
+	private String city;
+
+	// private State state;
+	private String state;
+
+	// private Country country;
+	private String country;
+
+	// private AddressType type;
+	private int type;
+
+	@NotNull
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
+	@JoinColumn(name = "member_id") // @JsonManagedReference
+	private Member member;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getStreet() {
+		return street;
+	}
+
+	public void setStreet(String street) {
+		this.street = street;
+	}
+
+	public String getNumber() {
+		return number;
+	}
+
+	public void setNumber(String number) {
+		this.number = number;
+	}
+
+	public String getComplement() {
+		return complement;
+	}
+
+	public void setComplement(String complement) {
+		this.complement = complement;
+	}
+
+	public String getCep() {
+		return cep;
+	}
+
+	public void setCep(String cep) {
+		this.cep = cep;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	@Override
+	public String toString() {
+		return "MemberAddress [id=" + id + ", street=" + street + ", number=" + number + ", complement=" + complement
+				+ ", cep=" + cep + ", city=" + city + ", state=" + state + ", country=" + country + ", type=" + type
+				+ "]";
+	}
+
+	public Member getMember() {
+		return member;
+	}
+
+	public void setMember(Member member) {
+		this.member = member;
+	}
+
+}
+			</code></pre>	
+			
+			<h3>Criar a classe "MemberPhone.class" no pacote "br.com.va4e.gidac.entity"</h3>
+			<pre><code class="java">
+package br.com.va4e.gidac.entity;
+
+import java.io.Serializable;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
+
+@Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"ddd", "phone", "extension", "type", "member_id"}), name = "member_phone")
+public class MemberPhone implements Serializable {
+	
+	public MemberPhone(String ddd, String phone, String extension, String note, int type, Member member) {
+
+		this.ddd = ddd;
+		this.phone = phone;
+		this.extension = extension;
+		this.note = note;
+		this.type = type;
+		this.member = member;
+	}
+
+	public MemberPhone() {
+
+	}
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	private String ddd;
+
+	private String phone;
+
+	private String extension;
+
+	private String note;
+
+	private int type;
+	
+	@NotNull
+	@ManyToOne(cascade={CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+	@JoinColumn(name = "member_id")
+	 //@JsonIgnore
+	private Member member;
+
+	@Override
+	public String toString() {
+		return "MemberPhone [id=" + id + ", ddd=" + ddd + ", phone=" + phone + ", extension=" + extension + ", note="
+				+ note + ", type=" + type + "]";
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getDdd() {
+		return ddd;
+	}
+
+	public void setDdd(String ddd) {
+		this.ddd = ddd;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getExtension() {
+		return extension;
+	}
+
+	public void setExtension(String extension) {
+		this.extension = extension;
+	}
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public Member getMember() {
+		return member;
+	}
+
+	public void setMember(Member member) {
+		this.member = member;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+}
+			</code></pre>	
+			<h3>Criar a classe "MemberEmail.class" no pacote "br.com.va4e.gidac.entity"</h3>
+			<pre><code class="java">
+package br.com.va4e.gidac.entity;
+
+import java.io.Serializable;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.Email;
+
+@Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "email", "member_id" }), name = "member_email")
+public class MemberEmail  implements Serializable {
+
+	public MemberEmail(String email, int type, boolean isDefault, boolean isActive, Member member) {
+
+		this.email = email;
+		this.type = type;
+		this.member = member;
+		this.isDefault = isDefault;
+		this.isActive = isActive;
+	}
+
+	public MemberEmail() {
+
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public Member getMember() {
+		return member;
+	}
+
+	public void setMember(Member member) {
+		this.member = member;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@Override
+	public String toString() {
+		return "MemberEmail [id=" + id + ", email=" + email + ", type=" + type + "]";
+	}
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@NotNull
+	@Email
+	private String email;
+
+	@NotNull
+	private int type;
+
+	@NotNull
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
+	@JoinColumn(name = "member_id")
+	private Member member;
+
+	@NotNull
+	private boolean isDefault;
+
+	@NotNull
+	private boolean isActive;
+
+	public boolean isDefault() {
+		return isDefault;
+	}
+
+	public void setDefault(boolean isDefault) {
+		this.isDefault = isDefault;
+	}
+
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
+	}
+
+}
+			</code></pre>
+</section>
+
+<section>
+			<h2>Criar Repositórios</h2>
+			<h3>Criar a classe "MemberRepository.class" no pacote "br.com.va4e.gidac.repository"</h3>
+<h3>Criar a classe "MemberAddressRepository.class" no pacote "br.com.va4e.gidac.repository"</h3>
+
+<h3>Criar a classe "MemberPhoneRepository.class" no pacote "br.com.va4e.gidac.repository"</h3>
+<h3>Criar a classe "MemberEmailRepository.class" no pacote "br.com.va4e.gidac.repository"</h3>
+
+		</section>
 
 
 		<div class="principal">
@@ -196,10 +911,25 @@ public class Gidac1Application {
 }
 			</code></pre>
 		</div>
+
+<section>
+<h2>Dicas</h2>
+<p>By default, Spring Data REST serves up REST resources at the root URI, "/". There are multiple ways to change the base path.</p>
+<p>@SpringBootApplication is a convenience annotation that adds all of the following:<br/>
+
+    @Configuration tags the class as a source of bean definitions for the application context.<br/>
+
+    @EnableAutoConfiguration tells Spring Boot to start adding beans based on classpath settings, other beans, and various property settings.<br/>
+
+    Normally you would add @EnableWebMvc for a Spring MVC app, but Spring Boot adds it automatically when it sees spring-webmvc on the classpath. This flags the application as a web application and activates key behaviors such as setting up a DispatcherServlet.<br/>
+
+    @ComponentScan tells Spring to look for other components, configurations, and services in the hello package, allowing it to find the controllers.
+
+</p>
+</section>
 	</div>
 </body>
 <footer>
-
 	<script src="webjars/highlightjs/highlight.min.js"
 		type="text/javascript"></script>
 
