@@ -3,111 +3,209 @@
 <head>
 <meta charset="UTF-8"></meta>
 <title>Histório Desenvolvimento G-IDAC</title>
-
 <link href="webjars/highlightjs/styles/rainbow.css" rel="stylesheet"
 	type="text/css" />
 
-
-
-
+	
+	
+<link href="webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet"
+	type="text/css" />
+	<link href="/css/gidac_style.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-	<h1>Histório Desenvolvimento G-IDAC</h1>
-	
-	<h2>Repositório GIT</h2>
-	<p>Criar repósitorio no GitHub e clonar para o seu PC.</p>
-	<p>Criar projeto Spring Starter colocando como local o repositorio clonado.</p>
-	
-	
-	
-	
-	<h2>Incluir WebJars no pom.xml</h2>
-	
-	<pre><code >
-	<!-- Webjars locator -->
-		&lt;dependency&gt;
-			&lt;groupId&gt;org.webjars&lt;/groupId&gt;
-			&lt;artifactId&gt;bootstrap&lt;/artifactId&gt;
-			&lt;version&gt;3.3.4&lt;/version&gt;
-		&lt;/dependency&gt;
-		&lt;dependency&gt;
-			&lt;groupId&gt;org.webjars&lt;/groupId&gt;
-			&lt;artifactId&gt;jquery&lt;/artifactId&gt;
-			&lt;version&gt;2.1.4&lt;/version&gt;
-		&lt;/dependency&gt;
-		&lt;dependency&gt;
-			&lt;groupId&gt;org.webjars&lt;/groupId&gt;
-			&lt;artifactId&gt;jTable&lt;/artifactId&gt;
-			&lt;version&gt;2.4.0&lt;/version&gt;
-		&lt;/dependency&gt;
-		&lt;dependency&gt;
-			&lt;groupId&gt;org.webjars&lt;/groupId&gt;
-			&lt;artifactId&gt;webjars-locator&lt;/artifactId&gt;
-		&lt;/dependency&gt;
-		&lt;dependency&gt;
-			&lt;groupId&gt;org.webjars&lt;/groupId&gt;
-			&lt;artifactId&gt;jquery-ui&lt;/artifactId&gt;
-			&lt;version&gt;1.12.1&lt;/version&gt;
-		&lt;/dependency&gt;
-		&lt;dependency&gt;
-			&lt;groupId&gt;org.webjars&lt;/groupId&gt;
-			&lt;artifactId&gt;jquery-ui-themes&lt;/artifactId&gt;
-			&lt;version&gt;1.12.1&lt;/version&gt;
-		&lt;/dependency&gt;
-		&lt;dependency&gt;
-			&lt;groupId&gt;org.webjars&lt;/groupId&gt;
-			&lt;artifactId&gt;highlightjs&lt;/artifactId&gt;
-			&lt;version&gt;9.8.0&lt;/version&gt;
-		&lt;/dependency&gt;
-	</code></pre>
-	
-	
-	
-	<h2>Criar a estrutura do projeto</h2>
-	<img src="/images/history/estrutura-projeto.png" alt=""/>
-	
-	<p>Descrever as pastas do projeto</p>
-	<h2>Configurar a Basa de Dados</h2>
-	
-	
-	<div class="principal">
-	<pre><code class="java">
-	
+	<div class="container">
+		<h1>Histório Desenvolvimento G-IDAC</h1>
+		<section>
+			<h2>Repositório GIT</h2>
+			<p>Criar repósitorio no GitHub e clonar para o seu PC.</p>
+			<p>Criar projeto Spring Starter colocando como local o
+				repositorio clonado.</p>
+		</section>
+		<section>
+			<h2>Criar Projeto Spring Starter</h2>
+			<h3>Crie um novo projeto Spring Starter</h3>
+			<figure class="thumbnail">
+            	<img src="/images/history/print_springio.png" alt="" />
+            	<figcaption class="caption">
+                <p>Configuração inicial do projeto</p>
+            	</figcaption>
+        	</figure>
+			<h3>Selecione os projetos que farão parte da sua  aplicação</h3>
+			<figure class="thumbnail">
+            	<img src="/images/history/print_springio_selection.png" alt="" />
+            	<figcaption class="caption">
+                <p>Seleção dos projetos base para o desenvolvimento</p>
+            	</figcaption>
+        	</figure>
+        	<h3>Crie a estrutura básica de diretórios do projeto</h3>
+			<figure class="thumbnail">
+            	<img src="/images/history/estrutura-projeto.png" alt="" />
+            	<figcaption class="caption">
+                <p>Estrutura Projeto Spring Boot Web</p>
+            	</figcaption>
+        	</figure>
+        	<p>Descrever as pastas do projeto</p>
+		</section>
 		
-		package br.com.va4e.gidac;
+				<section>
+			<h2>Configurar o LOG no application.properties</h2>
+			<pre><code>
+logging.file=log/spring-gidac-logging.log
+logging.level.org.springframework.web=DEBUG
+logging.level.br.com.va4e.idac=TRACE
+logging.level.org.hibernate=DEBUG
+logging.level.com.mchangge.v2.c3p0=DEBUG
+logging.level.org.springframework.orm=TRACE
+logging.level.org.springframework.data=TRACE
+logging.level.org.thymeleaf=DEBUG
+spring.main.banner-mode=off 
+spring.output.ansi.enabled=ALWAYS
+logging.pattern.console=  %clr(%5p) %d{yyyy-MM-dd HH:mm:ss} - %msg%n
+logging.pattern.file=%d ${CONTEXT_NAME} %level %msg %logger{50}%n
+			</code></pre>
+		</section>
 		
-		import org.springframework.boot.SpringApplication;
-		import org.springframework.boot.autoconfigure.SpringBootApplication;
+		<section>
+			<h2>Incluir WebJars no pom.xml</h2>
+			<pre><code>
+				&lt;dependency&gt;
+					&lt;groupId&gt;org.webjars&lt;/groupId&gt;
+					&lt;artifactId&gt;bootstrap&lt;/artifactId&gt;
+					&lt;version&gt;3.3.4&lt;/version&gt;
+				&lt;/dependency&gt;
+				&lt;dependency&gt;
+					&lt;groupId&gt;org.webjars&lt;/groupId&gt;
+					&lt;artifactId&gt;jquery&lt;/artifactId&gt;
+					&lt;version&gt;2.1.4&lt;/version&gt;
+				&lt;/dependency&gt;
+				&lt;dependency&gt;
+					&lt;groupId&gt;org.webjars&lt;/groupId&gt;
+					&lt;artifactId&gt;jTable&lt;/artifactId&gt;
+					&lt;version&gt;2.4.0&lt;/version&gt;
+				&lt;/dependency&gt;
+				&lt;dependency&gt;
+					&lt;groupId&gt;org.webjars&lt;/groupId&gt;
+					&lt;artifactId&gt;webjars-locator&lt;/artifactId&gt;
+				&lt;/dependency&gt;
+				&lt;dependency&gt;
+					&lt;groupId&gt;org.webjars&lt;/groupId&gt;
+					&lt;artifactId&gt;jquery-ui&lt;/artifactId&gt;
+					&lt;version&gt;1.12.1&lt;/version&gt;
+				&lt;/dependency&gt;
+				&lt;dependency&gt;
+					&lt;groupId&gt;org.webjars&lt;/groupId&gt;
+					&lt;artifactId&gt;jquery-ui-themes&lt;/artifactId&gt;
+					&lt;version&gt;1.12.1&lt;/version&gt;
+				&lt;/dependency&gt;
+				&lt;dependency&gt;
+					&lt;groupId&gt;org.webjars&lt;/groupId&gt;
+					&lt;artifactId&gt;highlightjs&lt;/artifactId&gt;
+					&lt;version&gt;9.8.0&lt;/version&gt;
+				&lt;/dependency&gt;
+			</code></pre>
+		</section>
 		
-		@SpringBootApplication
-		public class Gidac1Application {
+		<section>
+			<h2>Configurar a Basa de Dados</h2>
+			<h3>Criar a base de dados no MySQL</h3>
+			
+			
+			<p>Executar os comandos no MySql</p>
+			<pre><code class="sql">
+CREATE DATABASE  IF NOT EXISTS `idac`;
+USE `idac`;
+CREATE USER 'idac'@'localhost' IDENTIFIED BY 'seth';
+GRANT ALL PRIVILEGES ON * . * TO 'idac'@'localhost';
+			</code></pre>
+			<h3>Criar o arquivo de configuração da base de dados "database-persistence.properties" dentro da pasta resources.</h3>
+			
+			<pre><code>
+#
+# JDBC connection properties
+#
+
+##datasource
+idac.datasource.url = jdbc:mysql://localhost:3306/idac?useSSL=false
+idac.datasource.username =idac
+idac.datasource.password = seth
+idac.datasource.driver-class-name = com.mysql.jdbc.Driver
+idac.datasource.validationQuery = SELECT 1
+
+
+##jpa/hibernate
+idac.jpa.database=MYSQL
+idac.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQLDialect
+idac.jpa.hibernate.ddl-auto = update
+idac.jpa.show-sql=true
+
+#
+# Data Connection pool properties
+#
+idac.connection.pool.initialPoolSize=5
+idac.connection.pool.minPoolSize=5
+idac.connection.pool.maxPoolSize=20
+idac.connection.pool.maxIdleTime=3000
+			
+			</code></pre>
+			
+			<h3>Adicionar ao "pom.xml" a dependência C3p0 para habilitar a connection pool</h3>
+			
+			<pre><code>
+&lt;!-- Add MySQL and C3P0 support --&gt;
+&lt;dependency&gt;
+	&lt;groupId&gt;mysql&lt;/groupId&gt;
+	&lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+	&lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+	&lt;groupId&gt;com.mchange&lt;/groupId&gt;
+	&lt;artifactId&gt;c3p0&lt;/artifactId&gt;
+	&lt;version&gt;0.9.5.2&lt;/version&gt;
+&lt;/dependency&gt;			
+			</code></pre>
+			
+			
+			
+			
+			<h3>Criar a classe "DatabaseConfig.class" no pacote "br.com.va4e.gidac.config"</h3>
+			<pre><code>
+			
+			
+			
+			</code></pre>
 		
-			public static void main(String[] args) {
-				SpringApplication.run(Gidac1Application.class, args);
-			}
-		}
-	
-	
-	</code></pre>
+		
+		</section>
+		
+		
 
 
-</div>
+		<div class="principal">
+			<pre><code class="java">
+package br.com.va4e.gidac;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+@SpringBootApplication
+public class Gidac1Application {
 
-
-
-	
-	
-	
-	
+	public static void main(String[] args) {
+		SpringApplication.run(Gidac1Application.class, args);
+	}
+}
+			</code></pre>
+		</div>
+	</div>
 </body>
 <footer>
 
 	<script src="webjars/highlightjs/highlight.min.js"
 		type="text/javascript"></script>
 
-<script>hljs.initHighlightingOnLoad();</script>
+	<script>
+		hljs.initHighlightingOnLoad();
+	</script>
 
 </footer>
 </html>
