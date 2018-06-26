@@ -29,6 +29,7 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 @EnableTransactionManagement
 @EnableJpaRepositories(enableDefaultTransactions = true, basePackages  = "br.com.va4e.gidac.repository")
 @EntityScan({"br.com.va4e.gidac.entity"})
+
 public class AppConfig {
 
 	@Autowired
@@ -95,7 +96,7 @@ public class AppConfig {
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 		factory.setDataSource(dataSource);
 		factory.setJpaVendorAdapter(jpaVendorAdapter);
-		factory.setPackagesToScan("br.com.va4e.idac");
+		factory.setPackagesToScan("br.com.va4e.gidac");
 		factory.afterPropertiesSet();
 
 		return factory.getObject();
