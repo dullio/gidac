@@ -13,7 +13,7 @@ import br.com.va4e.gidac.entity.Member;
 
 
 
-@RepositoryRestResource(path = "members", rel = "members")
+@RepositoryRestResource(path = "members",itemResourceRel = "members")
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
 	<S extends Member> S save(S entity);
@@ -47,9 +47,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
 	List<Member> findAll(Sort sort) ;
 
-	List<Member> findAll(Iterable<Long> ids);
-
-	<S extends Member> List<S> save(Iterable<S> entities);
 	
 	void flush() ;
 

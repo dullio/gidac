@@ -152,10 +152,5 @@ public class Member implements Serializable {
 		this.userName = userName;
 	}
 
-	@Override
-	public String toString() {
-		return "Member [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", userName=" + userName
-				+ "]";
-	}
 
 }

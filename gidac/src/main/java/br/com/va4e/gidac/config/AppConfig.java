@@ -7,10 +7,12 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -21,11 +23,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
+
 @Configuration
 @PropertySource("classpath:database-persistence.properties")
-
 @EnableTransactionManagement
-public class DatabaseConfig {
+@EnableJpaRepositories(enableDefaultTransactions = true, basePackages  = "br.com.va4e.gidac.repository")
+@EntityScan({"br.com.va4e.gidac.entity"})
+public class AppConfig {
 
 	@Autowired
 	private Environment env;
@@ -51,8 +55,8 @@ public class DatabaseConfig {
 		// for sanity's sake, log this info
 		// just to make sure we are REALLY reading data from properties file
 
-		logger.info(">>>Database jdbc.url=" + env.getProperty("idac.datasource.url"));
-		logger.info(">>>Database jdbc.user=" + env.getProperty("idac.datasource.username"));
+		logger.warning(">>>Database jdbc.url=" + env.getProperty("idac.datasource.url"));
+		logger.warning(">>>Database jdbc.user=" + env.getProperty("idac.datasource.username"));
 		// set database connection props
 
 		dataSource.setJdbcUrl(env.getProperty("idac.datasource.url"));
