@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -26,7 +27,10 @@ public class MemberPhone implements Serializable {
 		this.type = type;
 		this.member = member;
 	}
-
+	
+	@Version
+    private Integer version;
+	
 	public MemberPhone() {
 
 	}

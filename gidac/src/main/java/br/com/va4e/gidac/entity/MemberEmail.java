@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Email;
@@ -28,6 +29,9 @@ public class MemberEmail  implements Serializable {
 		this.isActive = isActive;
 	}
 
+	@Version
+    private Integer version;
+	
 	public MemberEmail() {
 
 	}
