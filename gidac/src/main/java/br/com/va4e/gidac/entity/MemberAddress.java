@@ -2,13 +2,10 @@ package br.com.va4e.gidac.entity;
 
 import java.io.Serializable;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
@@ -24,7 +21,7 @@ public class MemberAddress implements Serializable {
 	}
 
 	public MemberAddress(String street, String number, String complement, String cep, String city, String state,
-			String country, int type, Member member) {
+			String country, int type) {
 
 		this.street = street;
 		this.number = number;
@@ -34,7 +31,7 @@ public class MemberAddress implements Serializable {
 		this.state = state;
 		this.country = country;
 		this.type = type;
-		this.member = member;
+
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -65,11 +62,6 @@ public class MemberAddress implements Serializable {
 
 	// private AddressType type;
 	private int type;
-
-	@NotNull
-	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
-	@JoinColumn(name = "member_id") // @JsonManagedReference
-	private Member member;
 
 	@Version
     private Integer version;
@@ -151,14 +143,6 @@ public class MemberAddress implements Serializable {
 		return "MemberAddress [id=" + id + ", street=" + street + ", number=" + number + ", complement=" + complement
 				+ ", cep=" + cep + ", city=" + city + ", state=" + state + ", country=" + country + ", type=" + type
 				+ "]";
-	}
-
-	public Member getMember() {
-		return member;
-	}
-
-	public void setMember(Member member) {
-		this.member = member;
 	}
 
 }

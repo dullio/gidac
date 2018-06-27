@@ -1,13 +1,19 @@
 package br.com.va4e.gidac.entity;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -66,9 +72,58 @@ public class Member implements Serializable {
 	private String gender;
 
 	private String note;
-	
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "member_id")
+	private Set<MemberAddress> addresses = new HashSet<MemberAddress>();
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "member_id")
+	private Set<MemberEmail> emails = new HashSet<MemberEmail>();
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "member_id")
+	//@RestResource(path = "MemberPhonerepositorys", rel="phones")
+	private Set<MemberPhone> phones = new HashSet<MemberPhone>();
+
+	public void addAddress(MemberAddress address) {
+
+		if (address != null) {
+			this.addresses.add(address);
+		}
+
+	}
+
+	public Set<MemberAddress> getAddresses() {
+		return Collections.unmodifiableSet(addresses);
+	}
+
+	public void addEmail(MemberEmail email) {
+
+		if (email != null) {
+			this.emails.add(email);
+		}
+
+	}
+
+	public Set<MemberEmail> getEmails() {
+		return Collections.unmodifiableSet(emails);
+	}
+
+	public void addPhone(MemberPhone phone) {
+
+		if (phone != null) {
+			this.phones.add(phone);
+		}
+
+	}
+
+	public Set<MemberPhone> getPhones() {
+		return Collections.unmodifiableSet(phones);
+	}
+
 	@Version
-    private Integer version;
+	private Integer version;
 
 	@NotNull
 	private boolean active;
@@ -155,6 +210,5 @@ public class Member implements Serializable {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
-
 
 }
