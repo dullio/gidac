@@ -5,9 +5,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import br.com.va4e.gidac.entity.MemberPhone;
 
-
-
-@RepositoryRestResource(path = "phones",itemResourceRel = "members")
+@RepositoryRestResource(exported = false)
 public interface MemberPhoneRepository extends JpaRepository<MemberPhone, Long> {
 
 	

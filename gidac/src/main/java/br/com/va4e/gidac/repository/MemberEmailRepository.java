@@ -5,9 +5,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import br.com.va4e.gidac.entity.MemberEmail;
 
-
-
-@RepositoryRestResource(path = "emails",itemResourceRel = "members")
+@RepositoryRestResource(exported = false)
 public interface MemberEmailRepository extends JpaRepository<MemberEmail, Long> {
 
 	// Nai vai funcionar assim emails é hashset 

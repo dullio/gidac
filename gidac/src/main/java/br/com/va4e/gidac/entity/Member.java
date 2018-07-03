@@ -9,23 +9,21 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
-import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "firstName", "lastName" }), name = "member")
-public class Member implements Serializable {
+public class Member extends AbstractEntity implements Serializable {
 
 	public Member(String firstName, String lastName, String userName, String cpf, String rg, String gender, String note,
 			boolean active, Date birthday) {
@@ -45,11 +43,7 @@ public class Member implements Serializable {
 
 	}
 
-	private static final long serialVersionUID = 1L;
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private static final long serialVersionUID =1L ;
 
 	@NotNull
 	@Size(min = 2, max = 25)
@@ -65,8 +59,10 @@ public class Member implements Serializable {
 	@Pattern(regexp = "[A-Za-z]*", message = "must contain only letters")
 	private String userName;
 
+	@Column(unique = true)
 	private String cpf;
 
+	@Column(unique = true)
 	private String rg;
 
 	private String gender;
@@ -75,18 +71,39 @@ public class Member implements Serializable {
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "member_id")
+	@JsonIgnore
 	private Set<MemberAddress> addresses = new HashSet<MemberAddress>();
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "member_id")
+	@JsonIgnore
 	private Set<MemberEmail> emails = new HashSet<MemberEmail>();
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "member_id")
-	//@RestResource(path = "MemberPhonerepositorys", rel="phones")
+	@JsonIgnore
 	private Set<MemberPhone> phones = new HashSet<MemberPhone>();
 
-	public void addAddress(MemberAddress address) {
+	@NotNull
+	private boolean active;
+
+	public void setAddresses(Set<MemberAddress> addresses) {
+		this.addresses = addresses;
+	}
+
+	public void setEmails(Set<MemberEmail> emails) {
+		this.emails = emails;
+	}
+
+	public void setPhones(Set<MemberPhone> phones) {
+		this.phones = phones;
+	}
+
+	@Temporal(TemporalType.DATE)
+	private Date birthday;
+	
+	
+	public void addAddresses(MemberAddress address) {
 
 		if (address != null) {
 			this.addresses.add(address);
@@ -121,15 +138,6 @@ public class Member implements Serializable {
 	public Set<MemberPhone> getPhones() {
 		return Collections.unmodifiableSet(phones);
 	}
-
-	@Version
-	private Integer version;
-
-	@NotNull
-	private boolean active;
-
-	@Temporal(TemporalType.DATE)
-	private Date birthday;
 
 	public boolean isActive() {
 		return active;
@@ -177,14 +185,6 @@ public class Member implements Serializable {
 
 	public void setRg(String rg) {
 		this.rg = rg;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getFirstName() {
